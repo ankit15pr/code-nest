@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 import javax.tools.JavaCompiler;
 import javax.tools.SimpleJavaFileObject;
@@ -40,20 +41,21 @@ public class Controller {
 	@PostMapping("/execute")
 	public ResponseEntity<String> executeCode(@RequestParam String language, @RequestParam String code) {
 		String id = generateRandomString(5);
-		switch (language.toLowerCase()) {
-		case "java":
-			executeJavaCode(code, id);
-			break;
-		case "python":
-			executePythonCode(code, id);
-			break;
-        case "cpp":
-            executeCppCode(code, id);
-            break;
-		// Add cases for other languages as needed
-		default:
-			return ResponseEntity.badRequest().body("Unsupported language: " + language);
-		}
+		CompletableFuture.runAsync(() -> {
+
+			switch (language.toLowerCase()) {
+			case "java":
+				executeJavaCode(code, id);
+				break;
+			case "python":
+				executePythonCode(code, id);
+				break;
+			case "cpp":
+				executeCppCode(code, id);
+				break;
+			// Add cases for other languages as needed
+			}
+		});
 		return ResponseEntity.ok(id);
 	}
 
