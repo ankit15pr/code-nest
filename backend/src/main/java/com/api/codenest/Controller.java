@@ -13,8 +13,11 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
@@ -23,6 +26,8 @@ import javax.tools.SimpleJavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,17 +39,38 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/code")
 public class Controller {
 
-	private final Map<String, String> codeExecutionResults = new HashMap<>();
+	@Autowired
+	private CodeExecutorService codeSummaryService;
 
 	private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 	@PostMapping("/execute")
 	public ResponseEntity<String> executeCode(@RequestParam String language, @RequestParam String code) {
+		System.out.println("Execute code called for language " + language);
 		String id = generateRandomString(5);
+<<<<<<< Updated upstream
+=======
+
+		// Save the language and code into MySQL
+		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/codenest", "root", "root")) {
+			String sql = "INSERT INTO codesummary (id, language, code) VALUES (?, ?, ?)";
+			try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+				pstmt.setString(1, id);
+				pstmt.setString(2, language);
+				pstmt.setString(3, code);
+				pstmt.executeUpdate();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving code to database");
+		}
+
+>>>>>>> Stashed changes
 		CompletableFuture.runAsync(() -> {
 
 			switch (language.toLowerCase()) {
 			case "java":
+<<<<<<< Updated upstream
 				executeJavaCode(code, id);
 				break;
 			case "python":
@@ -52,6 +78,15 @@ public class Controller {
 				break;
 			case "cpp":
 				executeCppCode(code, id);
+=======
+				executeJavaCode(id);
+				break;
+			case "python":
+				executePythonCode(id);
+				break;
+			case "cpp":
+				executeCppCode(id);
+>>>>>>> Stashed changes
 				break;
 			// Add cases for other languages as needed
 			}
@@ -61,7 +96,7 @@ public class Controller {
 
 	@GetMapping("/output")
 	public ResponseEntity<String> getOutput(@RequestParam String id) {
-		String output = codeExecutionResults.get(id);
+		String output = codeSummaryService.getFieldById(id).get().getOutput();
 		if (output == null) {
 			return ResponseEntity.notFound().build();
 		}
@@ -92,11 +127,12 @@ public class Controller {
 		}
 	}
 
-	private void executeJavaCode(String code, String id) {
+	private void executeJavaCode(String id) {
 		String output;
 		try {
+			Optional<CodeSummaryEntity> res = codeSummaryService.getFieldById(id);
 			Path sourcePath = Paths.get("Main.java");
-			Files.write(sourcePath, code.getBytes());
+			Files.write(sourcePath, res.get().getCode().getBytes());
 
 			// Redirect standard output to capture the response
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -122,11 +158,12 @@ public class Controller {
 
 			// Capture the output
 			output = outputStream.toString();
+
 		} catch (Exception e) {
 			System.out.println(e.toString());
 			output = e.toString();
 		}
-		codeExecutionResults.put(id, output);
+		codeSummaryService.updateFieldById(id, output);
 	}
 
 	public static String generateRandomString(int length) {
@@ -142,12 +179,13 @@ public class Controller {
 		return sb.toString();
 	}
 
-	private void executePythonCode(String code, String id) {
+	private void executePythonCode(String id) {
 		String output;
 		try {
 			// Write the Python code to a file
+			Optional<CodeSummaryEntity> res = codeSummaryService.getFieldById(id);
 			Path sourcePath = Paths.get("main.py");
-			Files.write(sourcePath, code.getBytes());
+			Files.write(sourcePath, res.get().getCode().getBytes());
 
 			// Execute the Python code
 			Process process = new ProcessBuilder("python", sourcePath.toString()).start();
@@ -174,15 +212,16 @@ public class Controller {
 		} catch (Exception e) {
 			output = "Error executing Python code:\n" + e.toString();
 		}
-		codeExecutionResults.put(id, output);
+		codeSummaryService.updateFieldById(id, output);
 	}
 
-	private void executeCppCode(String code, String id) {
+	private void executeCppCode(String id) {
 		String output;
 		try {
+			Optional<CodeSummaryEntity> res = codeSummaryService.getFieldById(id);
 			// Write the C++ code to a file
 			Path sourcePath = Paths.get("main.cpp");
-			Files.write(sourcePath, code.getBytes());
+			Files.write(sourcePath, res.get().getCode().getBytes());
 
 			// Compile the C++ code
 			Process compileProcess = new ProcessBuilder("g++", sourcePath.toString(), "-o", "main").start();
@@ -213,6 +252,6 @@ public class Controller {
 		} catch (Exception e) {
 			output = "Error executing C++ code:\n" + e.toString();
 		}
-		codeExecutionResults.put(id, output);
+		codeSummaryService.updateFieldById(id, output);
 	}
 }
