@@ -48,9 +48,6 @@ public class Controller {
 	public ResponseEntity<String> executeCode(@RequestParam String language, @RequestParam String code) {
 		System.out.println("Execute code called for language " + language);
 		String id = generateRandomString(5);
-<<<<<<< Updated upstream
-=======
-
 		// Save the language and code into MySQL
 		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/codenest", "root", "root")) {
 			String sql = "INSERT INTO codesummary (id, language, code) VALUES (?, ?, ?)";
@@ -65,20 +62,10 @@ public class Controller {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving code to database");
 		}
 
->>>>>>> Stashed changes
 		CompletableFuture.runAsync(() -> {
 
 			switch (language.toLowerCase()) {
 			case "java":
-<<<<<<< Updated upstream
-				executeJavaCode(code, id);
-				break;
-			case "python":
-				executePythonCode(code, id);
-				break;
-			case "cpp":
-				executeCppCode(code, id);
-=======
 				executeJavaCode(id);
 				break;
 			case "python":
@@ -86,7 +73,6 @@ public class Controller {
 				break;
 			case "cpp":
 				executeCppCode(id);
->>>>>>> Stashed changes
 				break;
 			// Add cases for other languages as needed
 			}
