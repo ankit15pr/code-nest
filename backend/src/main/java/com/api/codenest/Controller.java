@@ -2,14 +2,9 @@ package com.api.codenest;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintStream;
-import java.lang.reflect.Method;
 import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,10 +16,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
-import javax.tools.JavaCompiler;
 import javax.tools.SimpleJavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,16 +37,19 @@ public class Controller {
 	private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 	@PostMapping("/execute")
-	public ResponseEntity<String> executeCode(@RequestParam String language, @RequestParam String code) {
+	public ResponseEntity<String> executeCode(@RequestParam String language, @RequestParam String code,
+			@RequestParam String input) {
+
 		System.out.println("Execute code called for language " + language);
 		String id = generateRandomString(5);
 		// Save the language and code into MySQL
 		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/codenest", "root", "root")) {
-			String sql = "INSERT INTO codesummary (id, language, code) VALUES (?, ?, ?)";
+			String sql = "INSERT INTO codesummary (id, language, code, input) VALUES (?, ?, ?, ?)";
 			try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 				pstmt.setString(1, id);
 				pstmt.setString(2, language);
 				pstmt.setString(3, code);
+				pstmt.setString(4, input);
 				pstmt.executeUpdate();
 			}
 		} catch (SQLException e) {
@@ -74,6 +69,9 @@ public class Controller {
 			case "cpp":
 				executeCppCode(id);
 				break;
+			case "javascript":
+				executeJavaScriptCode(id);
+				break;
 			// Add cases for other languages as needed
 			}
 		});
@@ -82,7 +80,11 @@ public class Controller {
 
 	@GetMapping("/output")
 	public ResponseEntity<String> getOutput(@RequestParam String id) {
-		String output = codeSummaryService.getFieldById(id).get().getOutput();
+		Optional<CodeSummaryEntity> entity = codeSummaryService.getFieldById(id);
+		if (entity.isEmpty()) {
+			return ResponseEntity.badRequest().build();
+		}
+		String output = entity.get().getOutput();
 		if (output == null) {
 			return ResponseEntity.notFound().build();
 		}
@@ -113,41 +115,50 @@ public class Controller {
 		}
 	}
 
+	// java code
 	private void executeJavaCode(String id) {
 		String output;
 		try {
 			Optional<CodeSummaryEntity> res = codeSummaryService.getFieldById(id);
+			String input = res.get().getInput();
+
+			// Write the Java code to a file
 			Path sourcePath = Paths.get("Main.java");
 			Files.write(sourcePath, res.get().getCode().getBytes());
 
-			// Redirect standard output to capture the response
-			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			PrintStream printStream = new PrintStream(outputStream);
-			PrintStream standardOut = System.out;
-			System.setOut(printStream);
+//			// Compile the Java code
+//			Process compileProcess = new ProcessBuilder("java", "-c").start();
+//			compileProcess.waitFor();
 
-			// Compile the Java file
-			JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-			StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
-			compiler.getTask(null, fileManager, null, null, null, fileManager.getJavaFileObjects(sourcePath)).call();
-			fileManager.close();
+			// Execute the compiled Java code with input
+			ProcessBuilder processBuilder = new ProcessBuilder("java", sourcePath.toString());
+			Process executeProcess = processBuilder.start();
+			try (OutputStream outputStream = executeProcess.getOutputStream()) {
+				outputStream.write(input.getBytes());
+			}
 
-			// Load and execute the compiled class
-			URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { new File("").toURI().toURL() });
-			Class<?> clazz = Class.forName("Main", true, classLoader);
-			Method method = clazz.getMethod("main", String[].class);
-			method.invoke(null, new Object[] { null });
+			BufferedReader reader = new BufferedReader(new InputStreamReader(executeProcess.getInputStream()));
+			StringBuilder result = new StringBuilder();
+			String line;
+			while ((line = reader.readLine()) != null) {
+				result.append(line).append("\n");
+			}
 
-			// Reset standard output
-			System.out.flush();
-			System.setOut(standardOut);
-
-			// Capture the output
-			output = outputStream.toString();
-
+			// Wait for the process to complete and capture any errors
+			int exitCode = executeProcess.waitFor();
+			if (exitCode == 0) {
+				output = result.toString();
+			} else {
+				BufferedReader errorReader = new BufferedReader(new InputStreamReader(executeProcess.getErrorStream()));
+				StringBuilder errorResult = new StringBuilder();
+				String errorLine;
+				while ((errorLine = errorReader.readLine()) != null) {
+					errorResult.append(errorLine).append("\n");
+				}
+				output = "Error executing Java code:\n" + errorResult.toString();
+			}
 		} catch (Exception e) {
-			System.out.println(e.toString());
-			output = e.toString();
+			output = "Error executing Java code:\n" + e.toString();
 		}
 		codeSummaryService.updateFieldById(id, output);
 	}
@@ -165,16 +176,26 @@ public class Controller {
 		return sb.toString();
 	}
 
+	// python code
 	private void executePythonCode(String id) {
 		String output;
 		try {
-			// Write the Python code to a file
 			Optional<CodeSummaryEntity> res = codeSummaryService.getFieldById(id);
+			String input = res.get().getInput();
+
 			Path sourcePath = Paths.get("main.py");
 			Files.write(sourcePath, res.get().getCode().getBytes());
 
-			// Execute the Python code
-			Process process = new ProcessBuilder("python", sourcePath.toString()).start();
+			// Execute the Python code with input
+			ProcessBuilder processBuilder = new ProcessBuilder("python", sourcePath.toString());
+			Process process = processBuilder.start();
+
+			// Pass input to the process
+			try (OutputStream outputStream = process.getOutputStream()) {
+				outputStream.write(input.getBytes());
+			}
+
+			// Read the output of the Python script
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			StringBuilder result = new StringBuilder();
 			String line;
@@ -201,10 +222,13 @@ public class Controller {
 		codeSummaryService.updateFieldById(id, output);
 	}
 
+	// cpp code
 	private void executeCppCode(String id) {
 		String output;
 		try {
 			Optional<CodeSummaryEntity> res = codeSummaryService.getFieldById(id);
+			String input = res.get().getInput();
+
 			// Write the C++ code to a file
 			Path sourcePath = Paths.get("main.cpp");
 			Files.write(sourcePath, res.get().getCode().getBytes());
@@ -213,8 +237,13 @@ public class Controller {
 			Process compileProcess = new ProcessBuilder("g++", sourcePath.toString(), "-o", "main").start();
 			compileProcess.waitFor();
 
-			// Execute the compiled C++ code
-			Process executeProcess = new ProcessBuilder("./main").start();
+			// Execute the compiled C++ code with input
+			ProcessBuilder processBuilder = new ProcessBuilder("./main");
+			Process executeProcess = processBuilder.start();
+			try (OutputStream outputStream = executeProcess.getOutputStream()) {
+				outputStream.write(input.getBytes());
+			}
+
 			BufferedReader reader = new BufferedReader(new InputStreamReader(executeProcess.getInputStream()));
 			StringBuilder result = new StringBuilder();
 			String line;
@@ -240,4 +269,48 @@ public class Controller {
 		}
 		codeSummaryService.updateFieldById(id, output);
 	}
+
+	// js code
+	private void executeJavaScriptCode(String id) {
+		String output;
+		try {
+			// Store the JavaScript code temporarily in a file (same as before)
+			Optional<CodeSummaryEntity> res = codeSummaryService.getFieldById(id);
+			String input = res.get().getInput();
+			Path scriptPath = Paths.get("main.js");
+			Files.write(scriptPath, res.get().getCode().getBytes());
+
+			// Use Node.js to execute the script with input
+			ProcessBuilder processBuilder = new ProcessBuilder("node", scriptPath.toString());
+			Process process = processBuilder.start();
+			try (OutputStream outputStream = process.getOutputStream()) {
+				outputStream.write(input.getBytes());
+			}
+
+			// Capture output
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			StringBuilder result = new StringBuilder();
+			String line;
+			while ((line = reader.readLine()) != null) {
+				result.append(line).append("\n");
+			}
+			output = result.toString();
+
+			// Handle errors
+			int exitCode = process.waitFor();
+			if (exitCode != 0) {
+				BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+				StringBuilder errorResult = new StringBuilder();
+				String errorLine;
+				while ((errorLine = errorReader.readLine()) != null) {
+					errorResult.append(errorLine).append("\n");
+				}
+				output = "Error executing JavaScript code:\n" + errorResult.toString();
+			}
+		} catch (Exception e) {
+			output = "Error executing JavaScript code:\n" + e.toString();
+		}
+		codeSummaryService.updateFieldById(id, output);
+	}
+
 }
