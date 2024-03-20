@@ -16,6 +16,8 @@ public class CodeSummaryEntity {
 	private String language;
 	@Column(name = "output")
 	private String output;
+	@Column(name = "input")
+	private String input;
 
 	public String getId() {
 		return id;
@@ -47,6 +49,14 @@ public class CodeSummaryEntity {
 
 	public void setOutput(String output) {
 		this.output = output;
+	}
+	
+	public String getInput() {
+		return input;
+	}
+	
+	public void setInput(String input) {
+		this.input = input;
 	}
 
 }
