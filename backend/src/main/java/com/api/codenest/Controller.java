@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -21,14 +22,17 @@ import javax.tools.SimpleJavaFileObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+@CrossOrigin(maxAge = 3600)
 @RestController
 @RequestMapping("/api/code")
+//@CrossOrigin(origins = "http://localhost:5500")
 public class Controller {
 
 	@Autowired
@@ -37,9 +41,10 @@ public class Controller {
 	private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 	@PostMapping("/execute")
-	public ResponseEntity<String> executeCode(@RequestParam String language, @RequestParam String code,
-			@RequestParam String input) {
-
+	public ResponseEntity<String> executeCode(@RequestBody Map<String, String> requestBody) {
+		String language = requestBody.get("language");
+		String code = requestBody.get("code");
+		String input = requestBody.get("input");
 		System.out.println("Execute code called for language " + language);
 		String id = generateRandomString(5);
 		// Save the language and code into MySQL
@@ -77,7 +82,8 @@ public class Controller {
 		});
 		return ResponseEntity.ok(id);
 	}
-
+	
+	@CrossOrigin(origins = "http://localhost:5500")
 	@GetMapping("/output")
 	public ResponseEntity<String> getOutput(@RequestParam String id) {
 		Optional<CodeSummaryEntity> entity = codeSummaryService.getFieldById(id);
@@ -88,6 +94,7 @@ public class Controller {
 		if (output == null) {
 			return ResponseEntity.notFound().build();
 		}
+		System.out.println(output);
 		return ResponseEntity.ok(output);
 	}
 
