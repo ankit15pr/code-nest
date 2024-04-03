@@ -1,5 +1,5 @@
 body {
-    background-image: url('back.jpg');
+    /* background-image: url('back.jpg'); */
     background-position: center;
     background-size: cover;
     background-attachment: fixed;
@@ -7,9 +7,16 @@ body {
     font-family: 'Lato', sans-serif;
     margin: 0;
     padding: 0;
+    background-color: #111;
     color: aliceblue;
     background-color: #0d0c0c;
 }
+
+.nav_element:hover{
+    color:orangered;
+}
+
+
 
 
 .header {
@@ -56,12 +63,6 @@ body {
     transition: all 0.2s ease-out;
   }
   
-/* .button-73:hover::before {
-    -webkit-animation: sh02 0.5s 0s linear;
-    -moz-animation: sh02 0.5s 0s linear;
-    animation: sh02 0.5s 0s linear;
-  } */
-  
 .button-73::before {
     content: '';
     display: block;
@@ -101,6 +102,28 @@ body {
     -webkit-transition: box-shadow 0.2s ease-in;
     -moz-transition: box-shadow 0.2s ease-in;
     transition: box-shadow 0.2s ease-in;
+  }
+
+  .button-34 {
+    background: orangered;
+    border-radius: 999px;
+    /* box-shadow: #5E5DF0 0 10px 20px -10px; */
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    opacity: 1;
+    outline: 0 solid transparent;
+    padding: 8px 18px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+    word-break: break-word;
+    border: 0;
   }
      
    
@@ -184,8 +207,8 @@ header nav a {
 
 }
 .lap {
-    width:60%;
-    height:60%;
+    width:85%;
+    height:85%;
     padding-top: 50px;
     display: flex;
     justify-content: center;
@@ -279,7 +302,8 @@ header nav a {
 }
 .detail1{
     margin: 150px auto;
-    width: 70%;
+
+    width: 85%;
 }
 .text-box1{
     color: orangered;
@@ -296,12 +320,12 @@ header nav a {
     color: aliceblue;
 }
 .img2{
-    float: right;
-    margin-right: -100px;
+    float: left;
+    margin-right: 29px;
 }
 .detail2{
     margin: 150px auto;
-    width: 70%;
+    width: 85%;
 }
 .text-box2{
     color: orangered;
@@ -322,7 +346,7 @@ header nav a {
 }
 .detail3{
     margin: 150px auto;
-    width: 70%;
+    width: 85%;
 }
 .text-box3{
     color: orangered;
