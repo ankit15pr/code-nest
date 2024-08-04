@@ -62,19 +62,19 @@ public class Controller {
 		CompletableFuture.runAsync(() -> {
 
 			switch (language.toLowerCase()) {
-			case "java":
-				executeJavaCode(id);
-				break;
-			case "python":
-				executePythonCode(id);
-				break;
-			case "cpp":
-				executeCppCode(id);
-				break;
-			case "javascript":
-				executeJavaScriptCode(id);
-				break;
-			// Add cases for other languages as needed
+				case "java":
+					executeJavaCode(id);
+					break;
+				case "python":
+					executePythonCode(id);
+					break;
+				case "cpp":
+					executeCppCode(id);
+					break;
+				case "javascript":
+					executeJavaScriptCode(id);
+					break;
+				// Add cases for other languages as needed
 			}
 		});
 		return ResponseEntity.ok(id);
@@ -118,7 +118,6 @@ public class Controller {
 		}
 	}
 
-	// java code
 	private void executeJavaCode(String id) {
 		String output;
 		try {

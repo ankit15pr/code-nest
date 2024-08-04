@@ -16,9 +16,6 @@ body {
     color:orangered;
 }
 
-
-
-
 .header {
     margin-top: -9px;
     padding-top: 15px;
@@ -125,14 +122,10 @@ body {
     word-break: break-word;
     border: 0;
   }
-     
-   
-   
-   
-   
+
 
 header nav {
-    width: 32%;
+    width: 20%;
     padding-right: 28px;
     display: flex;
     justify-content: space-between;
@@ -146,8 +139,6 @@ header nav a {
     text-decoration: none;
     position: relative;
 }
-
-
 
 .button- {
     appearance: none;
@@ -390,9 +381,6 @@ header nav a {
 }
 
 
-
-/* ///////// */
-
 .button-85 {
     font-size: 1em;
     font-weight: 800;
@@ -468,80 +456,6 @@ header nav a {
   border-radius: 10px;
 }
 
-/* footer  */
-
-.container{
-	max-width: 1170px;
-	margin:auto;
-    
-    
-}
-.row{
-	display: flex;
-	/* flex-wrap: wrap; */
-}
-ul{
-	list-style: none;
-}
-.footer{
-	background-color: #24262b;
-    
-}
-.footer-col{
-   width: 25%;
-   padding: 0 15px;
-}
-.footer-col h4{
-	font-size: 18px;
-	color: #ffffff;
-	text-transform: capitalize;
-	margin-bottom: 35px;
-	font-weight: 500;
-	position: relative;
-}
-.footer-col h4::before{
-	content: '';
-	position: absolute;
-	left:0;
-	bottom: -10px;
-	background-color: #e91e63;
-	height: 2px;
-	box-sizing: border-box;
-	width: 50px;
-}
-.footer-col ul li:not(:last-child){
-	margin-bottom: 10px;
-}
-.footer-col ul li a{
-	font-size: 16px;
-	text-transform: capitalize;
-	color: #ffffff;
-	text-decoration: none;
-	font-weight: 300;
-	color: #bbbbbb;
-	display: block;
-	transition: all 0.3s ease;
-}
-.footer-col ul li a:hover{
-	color: #ffffff;
-	padding-left: 8px;
-}
-.footer-col .social-links a{
-	display: inline-block;
-	height: 40px;
-	width: 40px;
-	background-color: rgba(255,255,255,0.2);
-	margin:0 10px 10px 0;
-	text-align: center;
-	line-height: 40px;
-	border-radius: 50%;
-	color: #ffffff;
-	transition: all 0.5s ease;
-}
-.footer-col .social-links a:hover{
-	color: #24262b;
-	background-color: #ffffff;
-}
 
 /*responsive*/
 @media(max-width: 767px){
@@ -555,14 +469,7 @@ ul{
     width: 100%;
 }
 }
-.tag{
 
-    /* background-color: #24262b; */
-    backdrop-filter: blur(30px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 
 .devloper{
     display: flex;
@@ -573,4 +480,10 @@ ul{
     backdrop-filter: blur(20px);
     font-size: 8em;
     margin-top: 20px;
+}
+
+.footer{
+    text-align: center;
+    padding: 1px;
+    padding-top: 80px;
 }

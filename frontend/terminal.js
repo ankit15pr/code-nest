@@ -5,7 +5,7 @@ ace.edit(editor, {
   mode: "ace/mode/python",
 });
 
-const apiUrl = 'http://localhost:8080/api/code/';
+const apiUrl = 'http://localhost:8081/api/code/';
         
         // Function to execute the code and fetch output
         function executeCode() {
