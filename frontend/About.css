@@ -1,64 +1,11 @@
-/* Global Styles */
-
 body {
   font-family: Arial, sans-serif;
   margin: 0;
-  padding: 0;
+  padding: 15px;
+  background-color: #111;
+  color: white;
 }
 
-header {
-  background-color: #333;
-  color: #fff;
-  padding: 10px 20px;
+#heading{
+  color: orangered;
 }
-
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-nav a {
-  color: #fff;
-  text-decoration: none;
-  margin-right: 20px;
-}
-
-main {
-  padding: 20px;
-}
-
-h2 {
-  color: #333;
-}
-
-h3 {
-  color: #555;
-}
-
-p {
-  line-height: 1.5;
-}
-
-ul {
-  list-style: none;
-}
-
-/* Specific Styles for About Section */
-
-#about {
-  margin-bottom: 50px;
-}
-
-#about ul {
-  padding-left: 20px;
-}
-
-#about ul li {
-  margin-bottom: 10px;
-}
-
-#about ul li strong {
-  color: #333;
-}
-

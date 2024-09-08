@@ -1,57 +1,70 @@
-body{
-  background-color: black;
+/* Flexbox container for sidebar and code section */
+#container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 200px; /* Space between sidebar and code editor */
+  padding: 20px;
 }
-  #editor{
-            
-    float: left;
-    size: 2em;
-    width: 55%;
-    height: 830px;
-    
-    
+
+/* Sidebar for language selection and inputs */
+#sidebar {
+  width: 400px;
+  color: white;
+  background-color: #1b2530; /* Slightly different background for the sidebar */
+  padding: 20px;
+  border-radius: 5px;
 }
-  #output {
-    float: right;
-    color: white;
-    width: 45%;
-    height: 830px;
-    background-color: rgb(15, 15, 15);
+
+/* Code section styling */
+#code-section {
+  display: flex;
+  flex-direction: column; 
+  width:50rem;
 }
-#input{
-    height: 20px;
-    width: 100px;
-    background-color: rgb(0, 0, 0);
-    color: rgb(253, 250, 250);
-    border: 2px #fdfdfd;
+
+#editor {
+  height: 520px;
+  width: 920px;
 }
-#button{
-  background: orangered;
-  border-radius: 999px;
-  /* box-shadow: #5E5DF0 0 10px 20px -10px; */
-  box-sizing: border-box;
-  color: #FFFFFF;
-  cursor: pointer;
-  font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 24px;
-  opacity: 1;
-  outline: 0 solid transparent;
-  padding: 8px 18px;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  width: fit-content;
-  word-break: break-word;
-  border: 0;
+
+#output {
+  height: 100px;
+  width: 900px;
+  margin-top: 10px;
+  background-color: #1e1e1e;
+  color: white;
+  padding: 10px;
+  border: 1px solid #333;
+}
+
+/* General body styling */
+body {
+  background-color: #111826;
+  color: white;
+  font-family: Arial, sans-serif;
 }
 
 #language{
-  height: 40px;
-  width: 110px;
+  width: 300px;
+  padding: 10px;
+  font-weight: bold;
   font-size: 1em;
-  border-radius: 11px;
-  border: 2px solid orangered;
-  color:orange;
-  background-color: black;
+}
+
+#userInput{
+  width: 340px;
+  height: 100px;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 1em;
+}
+
+#button{
+  width: 100px;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 1em;
+ 
 }

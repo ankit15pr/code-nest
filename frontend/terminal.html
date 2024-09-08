@@ -1,30 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Code Editor</title>
-    <link rel="stylesheet" href="terminal.css" />
-  </head>
-  <body>
-    <select id="language">
-        <option value="javascript">JavaScript</option>
-        <option value="python">Python</option>
-        <option value="java">Java</option>
-        <option value="cpp">C++</option>
-        <!-- Add more options for other languages if needed -->
-    </select>
-    <input type="text" id="userInput" placeholder="Input"> 
-    <button id="button" onclick="Run()">Run</button><!-- Button to fetch output -->
-    <h3 id="input">Code Editor</h2>
-    <div id ="code">
-        <div id="editor">// Code Here....</div>
-        <div id="output"></div>
-    </div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ace/1.5.3/ace.min.css">
+    <link rel="stylesheet" href="terminal.css">
+</head>
+<body>
+    <div id="container">
 
+        <!-- Code editor and output section -->
+        <div id="code-section">
+            <div id="editor">// Code Here....</div>
+            <div id="output"></div>
+        </div>
+
+        <!-- Sidebar for the language, input, and run button -->
+        <div id="sidebar">
+            <h2>Select language</h2>
+            <select id="language">
+                <option value="python">Python</option>
+                <option value="javascript">JavaScript</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+                <!-- Add more options for other languages if needed -->
+            </select>
+            <h3>Input arguments</h3>
+            <input type="text" id="userInput" placeholder="Input"> <br> <br>
+            <button id="button" onclick="Run()">Run</button>
+            <br>
+            <br>
+            <h1>--------Happy Coding--------</h1>
+            <br>
+            <br>
+            <br>
+            <pre>
+                 Powered By @CodeNest
+            </pre>
+                
+        </div>
+
+    </div>
+    
+
+    <!-- Ace Editor script -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.5.3/ace.js"></script>
 
+    <!-- Link to the external JavaScript file -->
     <script src="terminal.js"></script>
-  </body>
+</body>
 </html>
