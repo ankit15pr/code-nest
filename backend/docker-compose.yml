@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # Spring Boot service
+  spring-boot-app:
+    image: spring-boot-app
+    build:
+      context: .  # Ensure this is the root directory where the Dockerfile is
+      dockerfile: Dockerfile  # Ensure the Dockerfile is named correctly
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql-db  # Ensures the MySQL service is started first, but wait-for-it.sh does the actual wait
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/codenest
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - webapp-network
+
+  # MySQL service
+  mysql-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: codenest
+    ports:
+      - "3306:3306"
+    networks:
+      - webapp-network
+
+networks:
+  webapp-network:
+    driver: bridge

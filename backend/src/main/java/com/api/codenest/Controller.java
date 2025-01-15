@@ -118,6 +118,7 @@ public class Controller {
 		}
 	}
 
+	// java code
 	private void executeJavaCode(String id) {
 		String output;
 		try {
@@ -127,10 +128,6 @@ public class Controller {
 			// Write the Java code to a file
 			Path sourcePath = Paths.get("Main.java");
 			Files.write(sourcePath, res.get().getCode().getBytes());
-
-//			// Compile the Java code
-//			Process compileProcess = new ProcessBuilder("java", "-c").start();
-//			compileProcess.waitFor();
 
 			// Execute the compiled Java code with input
 			ProcessBuilder processBuilder = new ProcessBuilder("java", sourcePath.toString());
@@ -189,7 +186,7 @@ public class Controller {
 			Files.write(sourcePath, res.get().getCode().getBytes());
 
 			// Execute the Python code with input
-			ProcessBuilder processBuilder = new ProcessBuilder("python", sourcePath.toString());
+			ProcessBuilder processBuilder = new ProcessBuilder("python3", sourcePath.toString());
 			Process process = processBuilder.start();
 
 			// Pass input to the process
