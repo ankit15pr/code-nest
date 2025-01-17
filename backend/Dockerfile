@@ -32,8 +32,12 @@ COPY wait-for-it.sh /app/wait-for-it.sh
 # Make the wait-for-it.sh script executable
 RUN chmod +x /app/wait-for-it.sh
 
+# Ensure the app.jar file has execute permissions
+RUN chmod +x /app/app.jar
+
 # Expose the port your Spring Boot app is running on (default 8080)
-EXPOSE 8080
+EXPOSE 8081
 
 # Use wait-for-it.sh to wait for MySQL and then run the Spring Boot application
-CMD ["./wait-for-it.sh", "mysql-db:3306", "--", "java", "-jar", "app.jar"]
+# CMD ["./wait-for-it.sh", "mysql-db:3306", "--", "java", "-jar", "app.jar"]
+CMD ["./wait-for-it.sh", "mysql-db:3306", "--timeout=60", "--retries=5", "--", "java", "-jar", "app.jar"]

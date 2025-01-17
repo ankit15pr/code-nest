@@ -34,28 +34,28 @@ wait_for()
     do
         if [[ $WAITFORIT_ISBUSY -eq 1 ]]; then
             nc -z $WAITFORIT_HOST $WAITFORIT_PORT
-            WAITFORIT_result=$?
+            result=$?
         else
-            (echo -n > /dev/tcp/$WAITFORIT_HOST/$WAITFORIT_PORT) >/dev/null 2>&1
-            WAITFORIT_result=$?
+            (echo > /dev/tcp/$WAITFORIT_HOST/$WAITFORIT_PORT) >/dev/null 2>&1
+            result=$?
         fi
-        if [[ $WAITFORIT_result -eq 0 ]]; then
+        if [[ $result -eq 0 ]]; then
             WAITFORIT_end_ts=$(date +%s)
             echoerr "$WAITFORIT_cmdname: $WAITFORIT_HOST:$WAITFORIT_PORT is available after $((WAITFORIT_end_ts - WAITFORIT_start_ts)) seconds"
             break
         fi
         sleep 1
     done
-    return $WAITFORIT_result
+    return $result
 }
 
 wait_for_wrapper()
 {
     # In order to support SIGINT during timeout: http://unix.stackexchange.com/a/57692
     if [[ $WAITFORIT_QUIET -eq 1 ]]; then
-        timeout $WAITFORIT_BUSYTIMEFLAG $WAITFORIT_TIMEOUT $0 --quiet --child --host=$WAITFORIT_HOST --port=$WAITFORIT_PORT --timeout=$WAITFORIT_TIMEOUT &
+        timeout $WAITFORIT_TIMEOUT $0 --quiet --child --host=$WAITFORIT_HOST --port=$WAITFORIT_PORT --timeout=$WAITFORIT_TIMEOUT &
     else
-        timeout $WAITFORIT_BUSYTIMEFLAG $WAITFORIT_TIMEOUT $0 --child --host=$WAITFORIT_HOST --port=$WAITFORIT_PORT --timeout=$WAITFORIT_TIMEOUT &
+        timeout $WAITFORIT_TIMEOUT $0 --child --host=$WAITFORIT_HOST --port=$WAITFORIT_PORT --timeout=$WAITFORIT_TIMEOUT &
     fi
     WAITFORIT_PID=$!
     trap "kill -INT -$WAITFORIT_PID" INT
@@ -72,13 +72,8 @@ while [[ $# -gt 0 ]]
 do
     case "$1" in
         *:* )
-        WAITFORIT_hostport=(${1//:/ })
-        WAITFORIT_HOST=${WAITFORIT_hostport[0]}
-        WAITFORIT_PORT=${WAITFORIT_hostport[1]}
-        shift 1
-        ;;
-        --child)
-        WAITFORIT_CHILD=1
+        WAITFORIT_HOST=$(echo $1 | cut -d : -f 1)
+        WAITFORIT_PORT=$(echo $1 | cut -d : -f 2)
         shift 1
         ;;
         -q | --quiet)
@@ -121,11 +116,11 @@ do
         WAITFORIT_CLI=("$@")
         break
         ;;
-        --help)
-        usage
+        --child)
+        WAITFORIT_CHILD=1
+        shift 1
         ;;
         *)
-        echoerr "Unknown argument: $1"
         usage
         ;;
     esac
@@ -138,24 +133,7 @@ fi
 
 WAITFORIT_TIMEOUT=${WAITFORIT_TIMEOUT:-15}
 WAITFORIT_STRICT=${WAITFORIT_STRICT:-0}
-WAITFORIT_CHILD=${WAITFORIT_CHILD:-0}
-WAITFORIT_QUIET=${WAITFORIT_QUIET:-0}
-
-# Check to see if timeout is from busybox?
-WAITFORIT_TIMEOUT_PATH=$(type -p timeout)
-WAITFORIT_TIMEOUT_PATH=$(realpath $WAITFORIT_TIMEOUT_PATH 2>/dev/null || readlink -f $WAITFORIT_TIMEOUT_PATH)
-
-WAITFORIT_BUSYTIMEFLAG=""
-if [[ $WAITFORIT_TIMEOUT_PATH =~ "busybox" ]]; then
-    WAITFORIT_ISBUSY=1
-    # Check if busybox timeout uses -t flag
-    # (recent Alpine versions don't support -t anymore)
-    if timeout &>/dev/stdout | grep -q -e '-t '; then
-        WAITFORIT_BUSYTIMEFLAG="-t"
-    fi
-else
-    WAITFORIT_ISBUSY=0
-fi
+WAITFORIT_ISBUSY=$(which busybox >/dev/null 2>&1 && echo 1 || echo 0)
 
 if [[ $WAITFORIT_CHILD -gt 0 ]]; then
     wait_for

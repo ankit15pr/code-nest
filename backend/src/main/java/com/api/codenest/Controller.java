@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -126,7 +125,7 @@ public class Controller {
 			String input = res.get().getInput();
 
 			// Write the Java code to a file
-			Path sourcePath = Paths.get("Main.java");
+			Path sourcePath = Path.of("Main.java");
 			Files.write(sourcePath, res.get().getCode().getBytes());
 
 			// Execute the compiled Java code with input
@@ -182,7 +181,7 @@ public class Controller {
 			Optional<CodeSummaryEntity> res = codeSummaryService.getFieldById(id);
 			String input = res.get().getInput();
 
-			Path sourcePath = Paths.get("main.py");
+			Path sourcePath = Path.of("main.py");
 			Files.write(sourcePath, res.get().getCode().getBytes());
 
 			// Execute the Python code with input
@@ -229,7 +228,7 @@ public class Controller {
 			String input = res.get().getInput();
 
 			// Write the C++ code to a file
-			Path sourcePath = Paths.get("main.cpp");
+			Path sourcePath = Path.of("main.cpp");
 			Files.write(sourcePath, res.get().getCode().getBytes());
 
 			// Compile the C++ code
@@ -276,7 +275,7 @@ public class Controller {
 			// Store the JavaScript code temporarily in a file (same as before)
 			Optional<CodeSummaryEntity> res = codeSummaryService.getFieldById(id);
 			String input = res.get().getInput();
-			Path scriptPath = Paths.get("main.js");
+			Path scriptPath = Path.of("main.js");
 			Files.write(scriptPath, res.get().getCode().getBytes());
 
 			// Use Node.js to execute the script with input
